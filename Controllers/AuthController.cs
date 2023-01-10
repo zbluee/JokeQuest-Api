@@ -5,19 +5,30 @@ namespace JobServices.Controllers;
 
 [ApiController]
 [Route("/api/[Controller]")]
-public class AuthController : ControllerBase {
+public class AuthController : ControllerBase
+{
+
+    private readonly UserServices _userServices;
+    public AuthController(UserServices userServices)
+    {
+        _userServices = userServices;
+    }
 
     [HttpGet("users")]
-    public ActionResult<List<User>> GetAllUsers(){
-        return Ok(new List<User> {new Modles.User {Name = "user", Email = "user@gmail.com", Id = "001", Password = "password"}});
+    public async Task<ActionResult<List<User>>> GetAllUsers() => await _userServices.GetAllAsync();
+
+    [HttpPost("Register")]
+    public async Task<ActionResult<User>> Register([FromBody] UserRegisterDto requestDto)
+    {
+        if (!ModelState.IsValid) return BadRequest();
+        if (_userServices.FindUserByEmail(requestDto.Email) != null) return BadRequest();
+        var newUser = new User { Name = requestDto.Name, Email = requestDto.Email, Password = requestDto.Password };
+        await _userServices.CreateUser(newUser);
+        var user = _userServices.FindUserByEmail(requestDto.Email);
+        return Ok(user);
     }
 
-    [HttpPost("Register")] 
-    public ActionResult Register([FromBody] UserRegisterDto requestDto){
-        throw new NotImplementedException();
-    }
-
-    public ActionResult Login([FromBody] UserSignInDto requestDto) {
-        throw new NotImplementedException();
-    }
+    // public ActionResult Login([FromBody] UserSignInDto requestDto) {
+    //     throw new NotImplementedException();
+    // }
 }
