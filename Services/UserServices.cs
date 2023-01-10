@@ -14,7 +14,7 @@ public class UserServices {
         _user = database.GetCollection<User>(mongoDBConfig.Value.UserCollectionName);
     }
 
-    public async Task<List<User>> GetAllUsers() => await _user.Find(_ => true).ToListAsync();
+    public async Task<List<User>> GetAllAsync() => await _user.Find(_ => true).ToListAsync();
     public async Task CreateUser(User user) => await _user.InsertOneAsync(user);
-    public async Task<User> FindUserById(string id) =>  await _user.Find(user => user.Id == id).FirstOrDefaultAsync();
+    public async Task<User> FindUserByEmail(string email) =>  await _user.Find(user => user.Email == email).FirstOrDefaultAsync();
 }
