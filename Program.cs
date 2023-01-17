@@ -1,4 +1,10 @@
 using JobServices.Configs;
+using JobServices.Services;
+using JobServices.MiddleWares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,9 +14,39 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using Bearer Scheme (\"bearer {token}\")",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 builder.Services.Configure<MongoDBConfig>(builder.Configuration.GetSection("MongoDB"));
+builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddSingleton<UserServices>();
+builder.Services.AddSingleton<JwtUtils>();
+builder.Services.AddTransient<JwtMiddleware>();
+builder.Services.AddTransient<ErrorHandlerMiddleware>();
+
+//configuring jwt
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+    var Signingkey = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt:Secret").Value);
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Signingkey),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+    };
+});
 
 var app = builder.Build();
 
@@ -24,6 +60,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
+
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/Job"), appBuilder => {
+    appBuilder.UseMiddleware<JwtMiddleware>();
+});
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.MapControllers();
 
