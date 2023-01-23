@@ -1,6 +1,6 @@
-using JobServices.Configs;
-using JobServices.Services;
-using JobServices.MiddleWares;
+using JokeApi.Configs;
+using JokeApi.Services;
+using JokeApi.MiddleWares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Filters;
@@ -62,7 +62,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseAuthentication();
-
+// add jwt middleware for specific path.
 app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/Job"), appBuilder => {
     appBuilder.UseMiddleware<JwtMiddleware>();
 });

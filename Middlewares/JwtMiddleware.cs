@@ -1,6 +1,6 @@
-using JobServices.Services;
-using JobServices.Errors;
-namespace JobServices.MiddleWares;
+using JokeApi.Services;
+using JokeApi.Errors;
+namespace JokeApi.MiddleWares;
 
 public class JwtMiddleware : IMiddleware
 {

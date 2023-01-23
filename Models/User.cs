@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace JobServices.Modles;
+namespace JokeApi.Modles;
 
 [BsonIgnoreExtraElements]
 public class User {
@@ -21,6 +21,7 @@ public class User {
 
     [BsonElement("password")]
     [Required]
+    // [StringLength(maximumLength:30,MinimumLength = 6)]
     public string Password { get; set; } = null!;
 
     [BsonElement("createdAt")]

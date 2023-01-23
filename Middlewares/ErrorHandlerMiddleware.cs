@@ -1,8 +1,8 @@
 using System.Net;
-using JobServices.Errors;
-using JobServices.Modles;
+using JokeApi.Errors;
+using JokeApi.Modles;
 
-namespace JobServices.MiddleWares;
+namespace JokeApi.MiddleWares;
 
 public class ErrorHandlerMiddleware : IMiddleware
 {

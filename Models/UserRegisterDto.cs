@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace JobServices.Modles;
+namespace JokeApi.Modles;
 
 public class UserRegisterDto
 {

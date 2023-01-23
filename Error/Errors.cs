@@ -1,5 +1,5 @@
 using System.Net;
-namespace JobServices.Errors;
+namespace JokeApi.Errors;
 
 
 public class CustomAPIException : Exception

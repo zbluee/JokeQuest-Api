@@ -1,9 +1,9 @@
-using JobServices.Modles;
-using JobServices.Configs;
+using JokeApi.Modles;
+using JokeApi.Configs;
 using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 
-namespace JobServices.Services;
+namespace JokeApi.Services;
 public class UserServices {
 
     private readonly IMongoCollection<User> _user;
@@ -19,5 +19,5 @@ public class UserServices {
     public async Task DeleteAllAsync() => await _user.DeleteManyAsync(_ => true);
     public async Task CreateUser(User user) => await _user.InsertOneAsync(user);
     public async Task<User> FindUserByEmail(string email) =>  await _user.Find(user => user.Email == email).FirstOrDefaultAsync();
-    public async Task<User> FindUserById(string id) =>  await _user.Find(user => user.Id == id).FirstOrDefaultAsync();
+    public async Task<UserRequestDto> FindUserById(string id) =>  await _user.Find(user => user.Id == id).Project(user => new UserRequestDto{Id = user.Id, Name = user.Name, Email = user.Email}).FirstOrDefaultAsync();
 }

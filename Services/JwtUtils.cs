@@ -1,13 +1,13 @@
-using JobServices.Configs;
-using JobServices.Modles;
-using JobServices.Errors;
+using JokeApi.Configs;
+using JokeApi.Modles;
+using JokeApi.Errors;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text;
 
-namespace JobServices.Services;
+namespace JokeApi.Services;
 
 public class JwtUtils
 {

@@ -1,4 +1,4 @@
-namespace JobServices.Modles;
+namespace JokeApi.Modles;
 
 public class Response {
     public bool Success { get; set; }      
