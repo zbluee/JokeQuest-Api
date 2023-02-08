@@ -29,6 +29,8 @@ builder.Services.AddSwaggerGen(options => {
 builder.Services.Configure<MongoDBConfig>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddSingleton<UserServices>();
+builder.Services.AddSingleton<JokeServices>();
+builder.Services.AddScoped<IJwtUtils, JwtUtils>();
 builder.Services.AddSingleton<JwtUtils>();
 builder.Services.AddTransient<JwtMiddleware>();
 builder.Services.AddTransient<ErrorHandlerMiddleware>();
@@ -63,7 +65,7 @@ app.UseAuthorization();
 
 app.UseAuthentication();
 // add jwt middleware for specific path.
-app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/Job"), appBuilder => {
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/api/Joke"), appBuilder => {
     appBuilder.UseMiddleware<JwtMiddleware>();
 });
 
