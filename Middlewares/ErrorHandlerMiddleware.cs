@@ -22,7 +22,8 @@ public class ErrorHandlerMiddleware : IMiddleware
         {
             _looger.LogError(e, e.Message);
             var res = new ErrorResponse {Success = false, Msg = "something weng wrong please try again later.", StatusCode = (int) HttpStatusCode.InternalServerError};
-            if(e is CustomAPIException)  {res.Msg = e.Message; res.StatusCode = e.HResult;}
+            if(e is CustomAPIException)  {res.Msg = e.Message; res.StatusCode = e.HResult;};
+            if(e is FormatException) {res.Msg= e.Message; res.StatusCode = (int) HttpStatusCode.InternalServerError;};
             context.Response.StatusCode = res.StatusCode;
             await context.Response.WriteAsJsonAsync(res);
         }
