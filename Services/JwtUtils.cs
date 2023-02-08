@@ -9,7 +9,11 @@ using System.Text;
 
 namespace JokeApi.Services;
 
-public class JwtUtils
+public interface IJwtUtils {
+    string Sign(User user);
+    string Verify(string token);
+}
+public class JwtUtils : IJwtUtils
 {
     
     private readonly byte[] _signingKey;
@@ -23,9 +27,9 @@ public class JwtUtils
     public string Sign(User user)
     {
         // generate a user-specific jwt token that is valid for 15 days
-        if(user.Id == null) throw new NullReferenceException("id is required");
+        if(user.Id == null || user.Email == null || user.Name == null) throw new NullReferenceException("user name and email are required");
         var tokenHandler = new JwtSecurityTokenHandler();
-        var claims = new List<Claim> { new Claim("id", user.Id), new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) };
+        var claims = new List<Claim> { new Claim("id", user.Id), new Claim("name", user.Name), new Claim("email", user.Email), new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) };
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
             Subject = new ClaimsIdentity(claims),
