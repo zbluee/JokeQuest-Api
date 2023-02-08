@@ -4,12 +4,12 @@ namespace JokeApi.MiddleWares;
 
 public class JwtMiddleware : IMiddleware
 {
-    private readonly JwtUtils _jwtUtils;
+    private readonly IJwtUtils _jwtUtils;
     private readonly UserServices _userServices;
     private readonly ILogger<JwtMiddleware> _logger;
 
 
-    public JwtMiddleware(JwtUtils jwtUtils, ILogger<JwtMiddleware> logger, UserServices userServices)
+    public JwtMiddleware(IJwtUtils jwtUtils, ILogger<JwtMiddleware> logger, UserServices userServices)
     {
         _jwtUtils = jwtUtils;
         _logger = logger;
@@ -23,14 +23,14 @@ public class JwtMiddleware : IMiddleware
             if(String.IsNullOrWhiteSpace(token)) throw new BadRequestException("Empty Token");
             var userId = _jwtUtils.Verify(token);
             //attach user to context on successful jwt validation
-            context.Items["user"] = await _userServices.FindUserById(userId);
-            // _logger.LogInformation("userId : {1}", userId);
+            context.Items["userId"] = userId;
+            // _logger.LogInformation("userId : {0} {1} {2}", user.Id, user.Name, user.Email);
             await next(context);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            throw new BadRequestException("unable to verfiy token");
+            throw new BadRequestException("problem occur with your login.");
         }
     }
 }
