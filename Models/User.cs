@@ -24,6 +24,9 @@ public class User {
     // [StringLength(maximumLength:30,MinimumLength = 6)]
     public string Password { get; set; } = null!;
 
+    [BsonElement("role")]
+    public string Role {get; set; } = CustomRoles.Member.ToString();
+
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
