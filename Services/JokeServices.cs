@@ -18,9 +18,14 @@ public class JokeServices
 
     public async Task<List<Joke>> GetAllAsync(string userId, int pageSize, int page)
     {
+        if(String.IsNullOrWhiteSpace(userId)) throw new NullReferenceException("user Id");
         var filter = Builders<Joke>.Filter.AnyEq("createdBy", userId);
         return await _joke.Find(filter).Skip(pageSize * (page - 1)).Limit(pageSize).ToListAsync();
     }
+
+    public async Task<List<Joke>> GetAllJokes() => await _joke.Find(_ => true).ToListAsync();
+
+    public async Task<Joke> FindJokeById(string id) =>  await _joke.Find(joke => joke.Id == id).FirstOrDefaultAsync();
 
     public async Task<Joke> GetOneAsync(string userId, string jokeId) => await _joke.Find(joke => joke.CreatedBy == userId && joke.Id == jokeId).FirstOrDefaultAsync();
     public async Task CreateOneAsync(Joke joke) => await _joke.InsertOneAsync(joke);
@@ -35,10 +40,17 @@ public class JokeServices
         return await _joke.FindOneAndReplaceAsync(filter, joke, options);
     }
 
-    public async Task DeleteOne(string userId, string jokeId)
+    public async Task<Joke> DeleteOne(string userId, string jokeId)
     {
         var filter = Builders<Joke>.Filter.Where(joke => joke.CreatedBy == userId && joke.Id == jokeId);
-        await _joke.DeleteOneAsync(filter);
+        var joke = await _joke.FindOneAndDeleteAsync(filter);
+        return joke;
+    }
+
+    public async Task<Joke> DeleteOneById(string jokeId){
+        var filter = Builders<Joke>.Filter.Where(joke => joke.Id == jokeId);
+        var joke = await _joke.FindOneAndDeleteAsync(filter);
+        return joke;
     }
     public async Task DeleteAll() => await _joke.DeleteManyAsync(_ => true);
 }
