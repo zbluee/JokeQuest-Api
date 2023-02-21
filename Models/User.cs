@@ -25,7 +25,7 @@ public class User {
     public string Password { get; set; } = null!;
 
     [BsonElement("role")]
-    public string Role {get; set; } = CustomRoles.Member.ToString();
+    public string Role {get; set; } = CustomRoles.Member;
 
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
