@@ -28,10 +28,12 @@ builder.Services.AddSwaggerGen(options => {
 
 builder.Services.Configure<MongoDBConfig>(builder.Configuration.GetSection("MongoDB"));
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
-builder.Services.AddSingleton<UserServices>();
-builder.Services.AddSingleton<JokeServices>();
-builder.Services.AddScoped<IJwtUtils, JwtUtils>();
-builder.Services.AddSingleton<JwtUtils>();
+// builder.Services.AddSingleton<UserServices>();
+// builder.Services.AddSingleton<JokeServices>();
+builder.Services.AddSingleton<IJokeServices, JokeServices>();
+builder.Services.AddSingleton<IUserServices, UserServices>();
+builder.Services.AddSingleton<IJwtUtils, JwtUtils>();
+// builder.Services.AddSingleton<JwtUtils>();
 builder.Services.AddTransient<JwtMiddleware>();
 builder.Services.AddTransient<ErrorHandlerMiddleware>();
 
@@ -50,6 +52,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
 });
 
+builder.Services.ConfigureCors();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -58,6 +62,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
