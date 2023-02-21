@@ -5,7 +5,7 @@ using JokeApi.Configs;
 
 namespace JokeApi.Services;
 
-public class JokeServices
+public class JokeServices : IJokeServices
 {
     private readonly IMongoCollection<Joke> _joke;
 
@@ -16,22 +16,28 @@ public class JokeServices
         _joke = database.GetCollection<Joke>(mongoDBConfig.Value.JokeCollectionName);
     }
 
-    public async Task<List<Joke>> GetAllAsync(string userId, int pageSize, int page)
+    public async Task<List<Joke>> GetAllAsync(string? userId, int pageSize, int page)
     {
-        if(String.IsNullOrWhiteSpace(userId)) throw new NullReferenceException("user Id");
+        if (String.IsNullOrWhiteSpace(userId)) throw new NullReferenceException("user Id");
         var filter = Builders<Joke>.Filter.AnyEq("createdBy", userId);
         return await _joke.Find(filter).Skip(pageSize * (page - 1)).Limit(pageSize).ToListAsync();
     }
 
     public async Task<List<Joke>> GetAllJokes() => await _joke.Find(_ => true).ToListAsync();
 
-    public async Task<Joke> FindJokeById(string id) =>  await _joke.Find(joke => joke.Id == id).FirstOrDefaultAsync();
+    public async Task<Joke> FindJokeById(string id) => await _joke.Find(joke => joke.Id == id).FirstOrDefaultAsync();
 
-    public async Task<Joke> GetOneAsync(string userId, string jokeId) => await _joke.Find(joke => joke.CreatedBy == userId && joke.Id == jokeId).FirstOrDefaultAsync();
+    public async Task<Joke> GetOneAsync(string? userId, string jokeId)
+    {
+        if (String.IsNullOrWhiteSpace(userId)) throw new ArgumentNullException("userId");
+        return await _joke.Find(joke => joke.CreatedBy == userId && joke.Id == jokeId).FirstOrDefaultAsync();
+    }
+
     public async Task CreateOneAsync(Joke joke) => await _joke.InsertOneAsync(joke);
 
-    public async Task<Joke> UpdateJoke(string userId, string jokeId, Joke joke)
+    public async Task<Joke> UpdateJoke(string? userId, string jokeId, Joke joke)
     {
+        if(String.IsNullOrWhiteSpace(userId)) throw new ArgumentNullException("userId");
         var filter = Builders<Joke>.Filter.Where(joke => joke.CreatedBy == userId && joke.Id == jokeId);
         var options = new FindOneAndReplaceOptions<Joke>
         {
@@ -40,14 +46,16 @@ public class JokeServices
         return await _joke.FindOneAndReplaceAsync(filter, joke, options);
     }
 
-    public async Task<Joke> DeleteOne(string userId, string jokeId)
+    public async Task<Joke> DeleteOne(string? userId, string jokeId)
     {
+        if(String.IsNullOrWhiteSpace(userId)) throw new ArgumentNullException("userId");
         var filter = Builders<Joke>.Filter.Where(joke => joke.CreatedBy == userId && joke.Id == jokeId);
         var joke = await _joke.FindOneAndDeleteAsync(filter);
         return joke;
     }
 
-    public async Task<Joke> DeleteOneById(string jokeId){
+    public async Task<Joke> DeleteOneById(string jokeId)
+    {
         var filter = Builders<Joke>.Filter.Where(joke => joke.Id == jokeId);
         var joke = await _joke.FindOneAndDeleteAsync(filter);
         return joke;

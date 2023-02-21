@@ -4,8 +4,8 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 
 namespace JokeApi.Services;
-public class UserServices {
-
+public class UserServices : IUserServices
+{
     private readonly IMongoCollection<User> _user;
 
     public UserServices(IOptions<MongoDBConfig> mongoDBConfig)
