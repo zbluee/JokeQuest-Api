@@ -5,11 +5,11 @@ namespace JokeApi.MiddleWares;
 public class JwtMiddleware : IMiddleware
 {
     private readonly IJwtUtils _jwtUtils;
-    private readonly UserServices _userServices;
+    private readonly IUserServices _userServices;
     private readonly ILogger<JwtMiddleware> _logger;
 
 
-    public JwtMiddleware(IJwtUtils jwtUtils, ILogger<JwtMiddleware> logger, UserServices userServices)
+    public JwtMiddleware(IJwtUtils jwtUtils, ILogger<JwtMiddleware> logger, IUserServices userServices)
     {
         _jwtUtils = jwtUtils;
         _logger = logger;
