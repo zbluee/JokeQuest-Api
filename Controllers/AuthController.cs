@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using JokeApi.Modles;
 using Bcrypt = BCrypt.Net.BCrypt;
-using Microsoft.Extensions.Options;
 using JokeApi.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace JokeApi.Controllers;
 
@@ -12,23 +9,18 @@ namespace JokeApi.Controllers;
 [Route("/api/[Controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly IUserServices _userServices;
+    private readonly IJwtUtils _jwtUtils;
 
-    private readonly UserServices _userServices;
-    private readonly JwtUtils _jwtUtils;
-    public AuthController(UserServices userServices, JwtUtils jwtUtils)
+    public AuthController(IUserServices userServices, IJwtUtils jwtUtils)
     {
         _userServices = userServices;
         _jwtUtils = jwtUtils;
     }
 
-    [HttpGet("users"),Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<User>>> GetAllUsers() => Ok(await _userServices.GetAllAsync());
-
     [HttpPost("Register")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-
     public async Task<ActionResult<User>> Register([FromBody] UserRegisterDto requestDto)
     {
 
