@@ -13,10 +13,13 @@ namespace JokeApi.Controllers;
 public class JokeController : ControllerBase {
 
     private readonly IJokeServices _jokeServices;
+
+    private readonly IUserServices _userServices;
     private readonly ILogger<JokeController> _logger;
 
-    public JokeController(IJokeServices jokeServices, ILogger<JokeController> logger) {
+    public JokeController(IJokeServices jokeServices, IUserServices userServices, ILogger<JokeController> logger) {
         _jokeServices = jokeServices;
+        _userServices = userServices;
         _logger = logger;
         }
 
@@ -24,7 +27,7 @@ public class JokeController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult> GetAllJokes([FromQuery] QueryParameters queryParams) {
         var userId = HttpContext.Items["userId"];
-        if(userId == null) throw new ArgumentNullException("js");
+        if(userId == null) throw new ArgumentNullException("userId");
         var pageSize = queryParams.PageSize < 1 ?  10 : queryParams.PageSize;
         var page = queryParams.Page < 1 ? 1 : queryParams.Page;
         var jokes = await _jokeServices.GetAllAsync(userId : userId.ToString(), pageSize: pageSize, page : page);
@@ -32,6 +35,28 @@ public class JokeController : ControllerBase {
         return Ok(new Res{Success = true, Joke = jokes, Count = jokes.Count()});
     }
 
+    
+    [HttpGet("play")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult> Play([FromQuery]  JokeAnsQueryParams jokeAns){
+        var userId = HttpContext.Items["userId"];
+        if(userId == null) throw new ArgumentNullException("userId");
+        var joke = await _jokeServices.GetOneAsync(userId.ToString(), jokeAns.Id);
+        if(joke == null) return NotFound(new AuthResponse { Success = false, Msg = String.Format("No joke with id : {0} found", jokeAns.Id) });
+        if(String.Compare(joke.JokeAnswer, jokeAns.JokeAnswer, StringComparison.InvariantCultureIgnoreCase) != 0) return BadRequest(new AuthResponse {Success = false, Msg = "Wrong Answer. Please try again"});
+        await _userServices.UpdateUserPoint(joke.JokePoints, userId.ToString());
+        return Ok(new AuthResponse { Success = true, Msg = String.Format("Correct Answer !! You got {0} points", joke.JokePoints)});
+    } 
+
+    [HttpGet("points")]
+    public async Task<ActionResult> GetPoint(){
+        var userId = HttpContext.Items["userId"];
+        if(userId == null) throw new ArgumentNullException("userId");
+        var user = await _userServices.FindUserById(userId.ToString());
+        return Ok(new AuthResponse {Success = true, Msg = String.Format("Points : {0}", user.Point)});
+    }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,7 +66,7 @@ public class JokeController : ControllerBase {
         var userId = HttpContext.Items["userId"];
         if(userId == null) throw new ArgumentNullException("userId");
         // _logger.LogInformation("{0}\n{1}\n{2}", jokeDto.JokeQuestion, jokeDto.JokeAnswer, userId.ToString());
-        var joke = new Joke {JokeQuestion = jokeDto.JokeQuestion, JokeAnswer = jokeDto.JokeAnswer, CreatedBy = userId.ToString()};
+        var joke = new Joke {JokeQuestion = jokeDto.JokeQuestion, JokeAnswer = jokeDto.JokeAnswer, JokePoints = jokeDto.JokePoints, CreatedBy = userId.ToString()};
         await _jokeServices.CreateOneAsync(joke);
         return CreatedAtAction(nameof(GetAllJokes), new {id = "ate"}, jokeDto);
         
