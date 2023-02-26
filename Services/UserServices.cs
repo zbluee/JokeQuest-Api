@@ -30,9 +30,18 @@ public class UserServices : IUserServices
     public async Task UpdateUserPoint(int point, string? id)
     {
         var filter = Builders<User>.Filter.Where(user => user.Id == id);
-        var update = Builders<User>.Update.Set(user => user.Point, point);
+        var update = Builders<User>.Update.Inc(user => user.Point, point);
         await _user.FindOneAndUpdateAsync(filter, update);
     }
+
+    public async Task AddJokeIdToAnsweredList(string? userId, string? jokeId){
+        
+        if(String.IsNullOrWhiteSpace(jokeId)) throw new ArgumentNullException("joke id");
+        var filter = Builders<User>.Filter.Where(user => user.Id == userId);
+        var update = Builders<User>.Update.Push<string>(user => user.AnsweredJokesId, jokeId);
+        await _user.UpdateOneAsync(filter, update);
+    }
+
     public async Task<User> FindUserById(string? id)
     {
         if (String.IsNullOrWhiteSpace(id)) throw new ArgumentNullException("userId");
