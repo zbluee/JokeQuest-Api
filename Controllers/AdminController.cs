@@ -21,7 +21,7 @@ public class AdministrationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<User>>> GetAllUsers() => Ok(await _userServices.GetAllAsync());
 
-    [HttpGet("jokes")]
+    [HttpGet("/api/jokes"), AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<User>>> GetAllJokes() => Ok(await _jokeServices.GetAllJokes());
 

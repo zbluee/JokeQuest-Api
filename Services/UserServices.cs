@@ -17,13 +17,25 @@ public class UserServices : IUserServices
 
     public async Task<List<User>> GetAllAsync() => await _user.Find(_ => true).ToListAsync();
     public async Task DeleteAllAsync() => await _user.DeleteManyAsync(_ => true);
-    public async Task<User> DeleteOneAsync(string userId) {
+    public async Task<User> DeleteOneAsync(string userId)
+    {
         var filter = Builders<User>.Filter.Where(user => user.Id == userId);
         var user = await _user.FindOneAndDeleteAsync(filter);
         return user;
-    } 
+    }
     public async Task CreateUser(User user) => await _user.InsertOneAsync(user);
-    public async Task<User> FindUserByEmail(string email) =>  await _user.Find(user => user.Email == email).FirstOrDefaultAsync();
-    public async Task<User> FindUserByIdProjected(string id) =>  await _user.Find(user => user.Id == id).Project<User>(Builders<User>.Projection.Exclude(user => user.Password)).FirstOrDefaultAsync();
-    public async Task<User> FindUserById(string id) =>  await _user.Find(user => user.Id == id).FirstOrDefaultAsync();
+    public async Task<User> FindUserByEmail(string email) => await _user.Find(user => user.Email == email).FirstOrDefaultAsync();
+    public async Task<User> FindUserByIdProjected(string id) => await _user.Find(user => user.Id == id).Project<User>(Builders<User>.Projection.Exclude(user => user.Password)).FirstOrDefaultAsync();
+
+    public async Task UpdateUserPoint(int point, string? id)
+    {
+        var filter = Builders<User>.Filter.Where(user => user.Id == id);
+        var update = Builders<User>.Update.Set(user => user.Point, point);
+        await _user.FindOneAndUpdateAsync(filter, update);
+    }
+    public async Task<User> FindUserById(string? id)
+    {
+        if (String.IsNullOrWhiteSpace(id)) throw new ArgumentNullException("userId");
+        return await _user.Find(user => user.Id == id).FirstOrDefaultAsync();
+    }
 }
