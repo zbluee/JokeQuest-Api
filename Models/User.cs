@@ -24,6 +24,9 @@ public class User {
     // [StringLength(maximumLength:30,MinimumLength = 6)]
     public string Password { get; set; } = null!;
 
+    [BsonElement("point")]
+    public int Point { get; set; }
+
     [BsonElement("role")]
     public string Role {get; set; } = CustomRoles.Member;
 
