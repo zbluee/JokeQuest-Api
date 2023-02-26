@@ -10,5 +10,6 @@ public interface IUserServices {
     public Task<User> FindUserByEmail(string email);
     public Task<User> FindUserByIdProjected(string id);
     public Task UpdateUserPoint(int point, string? id);
+    public Task AddJokeIdToAnsweredList(string? userId, string? jokeId);
     public Task<User> FindUserById(string? id);
 }
