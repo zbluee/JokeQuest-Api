@@ -24,6 +24,10 @@ public class User {
     // [StringLength(maximumLength:30,MinimumLength = 6)]
     public string Password { get; set; } = null!;
 
+    [BsonElement("answred jokes Id")]
+    [BsonIgnoreIfDefault]
+    public List<string>? AnsweredJokesId { get; set; }
+
     [BsonElement("point")]
     public int Point { get; set; }
 
