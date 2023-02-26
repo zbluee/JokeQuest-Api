@@ -16,6 +16,10 @@ public class Joke {
     public string JokeAnswer { get; set; } = null!;
     [BsonElement("createdBy")]
     public string? CreatedBy { get; set; } 
+
+    [BsonElement("jokePoints")]
+    public int JokePoints { get; set; } 
+
     [BsonElement("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
