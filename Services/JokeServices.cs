@@ -26,6 +26,7 @@ public class JokeServices : IJokeServices
     public async Task<List<Joke>> GetAllJokes() => await _joke.Find(_ => true).ToListAsync();
 
     public async Task<Joke> FindJokeById(string id) => await _joke.Find(joke => joke.Id == id).FirstOrDefaultAsync();
+    public async Task<Joke> FindJokeByJQ(string jokeQuestion) => await _joke.Find(joke => joke.JokeQuestion == jokeQuestion).FirstOrDefaultAsync();
 
     public async Task<Joke> GetOneAsync(string? userId, string jokeId)
     {
