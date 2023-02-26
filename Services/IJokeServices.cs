@@ -9,6 +9,8 @@ public interface IJokeServices {
 
     public Task<Joke> FindJokeById(string id);
 
+    public Task<Joke> FindJokeByJQ(string jokeQuestion);
+
     public Task<Joke> GetOneAsync(string? userId, string jokeId);
     public Task CreateOneAsync(Joke joke);
 
