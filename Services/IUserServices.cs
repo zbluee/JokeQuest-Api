@@ -9,5 +9,6 @@ public interface IUserServices {
     public Task CreateUser(User user);
     public Task<User> FindUserByEmail(string email);
     public Task<User> FindUserByIdProjected(string id);
-    public Task<User> FindUserById(string id);
+    public Task UpdateUserPoint(int point, string? id);
+    public Task<User> FindUserById(string? id);
 }
